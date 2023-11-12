@@ -1,0 +1,35 @@
+#!/usr/bin/ruby
+
+if ARGV[0]=='home'
+  `sudo sntp -Ss time.apple.com`
+else
+  s= 0
+  ARGV.each_slice(2) do |num, type|  
+    m= case type.to_sym
+    when :s, :sec, :secs, :second, :seconds
+      1
+    when :m, :min, :mins, :minute, :minutes
+      60
+    when :h, :hr, :hrs, :hour, :hours
+      3600
+    when :d, :day, :days
+      86400
+    when :w, :week, :weeks
+      604800
+    when :month, :months
+      2592000
+      #TODO maybe also add possibility for "next month" or something like "1st of next month"      
+    when :y, :year, :years
+      31536000
+    end
+    s+= num.to_f*m    
+  end
+  n= Time.now+s
+  `sudo date #{n.strftime('%m%d%H%M')}`
+end
+
+# Usage
+# timetravel 1 week                         go 1 week into the future 
+# timetravel -1 week                        go 1 week into the past
+# timetravel 1 week -1 sec                  go 6 days 23 hours 59 minutes 59 seconds into the future (equivalent to 'timetravel 6 days 23 hours 59 minutes 59 seconds')
+# timetravel home                           return to real time
